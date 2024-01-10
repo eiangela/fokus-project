@@ -2,11 +2,14 @@ const btnAdicionarTarefa = document.querySelector('.app__button--add-task'); // 
 const formAdicionarTarefa = document.querySelector('.app__form-add-task'); // Da mesma forma, esta linha seleciona nosso formulário de adicionar tarefa.
 const textarea = document.querySelector('.app__form-textarea'); // E aqui, pegamos a área de texto onde o usuário digita a descrição da tarefa.
 const ulTarefas = document.querySelector('.app__section-task-list');
+const btnCancelar = document.querySelector('.app__form-footer__button--cancel'); 
 
 //const tarefas = []; // Esta é a nossa lista (ou array) de tarefas. Ela começa vazia porque ainda não adicionamos nenhuma tarefa.
 const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];  //o método parse é o inverso do stringify. Ele converte uma string para um objeto 
 
-
+function atualizarTarefas() { //criando ma função para atualizar o localStorage
+    localStorage.setItem('tarefas', JSON.stringify(tarefas));  //acessando o localStorage e pegando o item 'tarefas' e transformando em strings
+}
 
 function criarElementoTarefa(tarefa) { //Aqui é uma função para criar elementos dentro no HTML, em tarefa
     const li = document.createElement('li'); //Aqui criando uma referencia constante chamada li, criando o elemento no html. Dentro do parametro é a tag HTML que será utilizada
@@ -25,12 +28,21 @@ function criarElementoTarefa(tarefa) { //Aqui é uma função para criar element
     paragrafo.classList.add('app__section-task-list-item-description');
 
     const botao = document.createElement('button'); //criando uma referencia constante chamada botao, criando o elemento html. Dentro do parametro é a tag HTML que será utilizada
-    const imagemBotao = document.createElement('img'); //criando uma referencia constante chamada imagemBotao, criando o elemento html. Dentro do parametro é a tag HTML que será utilizada
-
-    imagemBotao.setAttribute('src', '/imagens/edit.png'); //O método setAttribute espera dois parametros. Nesse caso, definir o atributo src, e o segundo argumento é o valor para o atributo definido, nesse caso, o camaninho da imagem
-
-    botao.append(imagemBotao);  //o método append serve para colocar "dentro", nesse caso, colocar a imagem dentro do botão
     botao.classList.add('app_button-edit');
+    
+    botao.onclick = () => { //pegou a referencia do botao e adicionou o onclick que receberá uma função após o botão ser clicado
+        const novaDescricao = prompt("Qual é o novo nome da tarefa?"); //semelhante ao alert, exebira um prompt na tela com um campo para alterar a tarefa desejada
+      console.log('NOva descrição da tarefa: ', novaDescricao)
+      if (novaDescricao) { //fazendo uma validação com o if. o javascript vai interpretar um null como false e uma string vazia como false, uma string preenchida é true
+          paragrafo.textContent = novaDescricao; //aqui pegamos o paragrafo e subscrevemos o que já existe e adicionamos o textContent, atualizando com o valor que será digitado no prompt (camada visual)
+          tarefa.descricao = novaDescricao; //atualizando a refencia da tarefa, que é a camada de dados
+          atualizarTarefas(); // atualizando o localStore
+      }
+    }
+
+    const imagemBotao = document.createElement('img'); //criando uma referencia constante chamada imagemBotao, criando o elemento html. Dentro do parametro é a tag HTML que será utilizada
+    imagemBotao.setAttribute('src', '/imagens/edit.png'); //O método setAttribute espera dois parametros. Nesse caso, definir o atributo src, e o segundo argumento é o valor para o atributo definido, nesse caso, o camaninho da imagem
+    botao.append(imagemBotao);  //o método append serve para colocar "dentro", nesse caso, colocar a imagem dentro do botão
 
     li.append(svg); // o método append serve para colocar "dentro", nesse caso, colocar o svg dentro da li 
     li.append(paragrafo); // o método append serve para colocar "dentro", nesse caso, colocar o paragrafo dentro da li 
@@ -51,12 +63,19 @@ formAdicionarTarefa.addEventListener('submit', (evento) => { // Aqui, estamos ou
     tarefas.push(tarefa); // Depois, adicionamos essa tarefa ao nosso array de tarefas.
     const elementoTarefa = criarElementoTarefa(tarefa);
     ulTarefas.append(elementoTarefa);
-    localStorage.setItem('tarefas', JSON.stringify(tarefas)); // E, finalmente, armazenamos nossa lista de tarefas no localStorage.   // Convertendo o array para uma string com o stringify em formato JSON para poder armazenar. Aqui o stringify pega o objeto e transforma em string
+    atualizarTarefas(); // E, finalmente, armazenamos nossa lista de tarefas no localStorage.   // Convertendo o array para uma string com o stringify em formato JSON para poder armazenar. Aqui o stringify pega o objeto e transforma em string
     textarea.value = '';
-    formAdicionarTarefa.classList.add('hidden');
+    formAdicionarTarefa.classList.add('hidden'); // depois que o elemento for inseriado, o formulario é escondido 
 })
 
 tarefas.forEach(tarefa => {
    const elementoTarefa = criarElementoTarefa(tarefa);
    ulTarefas.append(elementoTarefa)
 ;}); 
+
+const limparFormulario = () => {
+    textarea.value = '';
+    formularioTarefa.classList.add('hidder');
+}
+
+btnCancelar.addEventListener('click', limparFormulario);
